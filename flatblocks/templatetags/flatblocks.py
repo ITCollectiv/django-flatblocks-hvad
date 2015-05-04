@@ -47,13 +47,13 @@ within that template.
 """
 from __future__ import absolute_import
 
+import logging
+
 from django import template
 from django.template.loader import render_to_string
 from django.db import models
 
 from flatblocks import settings
-
-import logging
 
 
 register = template.Library()
@@ -64,16 +64,23 @@ FlatBlock = models.get_model('flatblocks', 'flatblock')
 
 @register.simple_tag(takes_context=True)
 def flatblock(context, slug, evaluated=False, using='flatblocks/flatblock.html'):
-
     if not settings.AUTOCREATE_STATIC_BLOCKS:
         try:
             flatblock = FlatBlock.objects.get(slug=slug)
         except FlatBlock.DoesNotExist:
             return ''
     else:
-        flatblock, _ = FlatBlock.objects.get_or_create(slug=slug,
-            defaults={'content': slug}
-        )
+        try:
+            flatblock = FlatBlock.objects.language(context.request.LANGUAGE_CODE).get(slug=slug)
+        except:
+            flatblock, _ = FlatBlock.objects.language('en').get_or_create(slug=slug,
+                                                                          defaults={'content': slug}
+            )
+            # flatblock.translate(context.request.LANGUAGE_CODE)
+            # flatblock.content = slug
+            # flatblock.save()
+
+
 
     if evaluated:
         flatblock.raw_content = flatblock.content

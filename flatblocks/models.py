@@ -2,10 +2,12 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from hvad.models import TranslatableModel, TranslatedFields
+
 
 
 @python_2_unicode_compatible
-class FlatBlock(models.Model):
+class FlatBlock(TranslatableModel):
     """
     Think of a flatblock as a flatpage but for just part of a site. It's
     basically a piece of content with a given name (slug) and an optional
@@ -17,8 +19,9 @@ class FlatBlock(models.Model):
     header = models.CharField(_('Header'), blank=True, max_length=255,
         help_text=_("An optional header for this content")
     )
-    content = models.TextField(verbose_name=_('Content'), blank=True)
-
+    translations = TranslatedFields(
+        content = models.TextField(verbose_name=_('Content'), blank=True),
+    )
     # Helper attributes used if content should be evaluated in order to
     # represent the original content.
     raw_content = None

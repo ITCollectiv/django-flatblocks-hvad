@@ -43,5 +43,6 @@ setup(
     zip_safe=False,
     requires = [
         'Django (>=1.4)',
+        'django-hvad'
     ],
 )
